@@ -1,40 +1,36 @@
 <template>
   <div>
     <div v-if="isLoading" class="article-preview">Loading articles...</div>
-    <div v-else>
-      <div
-        class="article-preview"
-        v-for="(article, index) in articles"
-        :key="article.title + index"
-      >
-        <div class="article-meta">
-          <router-link
-            :to="{ name: 'profile', params: { username: article.author.username } }"
-          >
+
+    <!-- ################ move to ArticleMeta.vue Component -->
+    <!-- <div class="article-meta">
+          <router-link :to="{ name: 'profile', params: { username: article.author.username } }">
             <img :src="article.author.image" />
           </router-link>
           <div class="info">
             <router-link
               :to="{ name: 'profile', params: { username: article.author.username } }"
               class="author"
-            >
-              {{ article.author.username }}
-            </router-link>
+            >{{ article.author.username }}</router-link>
             <span class="date">{{ article.createdAt | date }}</span>
-          </div>
+          </div> 
+          
           <span v-if="isCurrentUser(article)">
             <router-link class="btn btn-sm btn-outline-secondary" :to="editArticleLink">
-              <i class="ion-edit"></i> <span>&nbsp;Edit Article</span>
+              <i class="ion-edit"></i>
+              <span>&nbsp;Edit Article</span>
             </router-link>
             <span>&nbsp;&nbsp;</span>
             <button class="btn btn-outline-danger btn-sm" @click="deleteArticle">
-              <i class="ion-trash-a"></i> <span>&nbsp;Delete Article</span>
+              <i class="ion-trash-a"></i>
+              <span>&nbsp;Delete Article</span>
             </button>
-          </span>
-          <!-- Used in ArticleView when not author -->
-          <span v-else>
+    </span>-->
+    <!-- Used in ArticleView when not author -->
+    <!-- <span v-else>
             <button class="btn btn-sm btn-outline-secondary" @click="toggleFollow">
-              <i class="ion-plus-round"></i> <span>&nbsp;</span>
+              <i class="ion-plus-round"></i>
+              <span>&nbsp;</span>
               <span v-text="followUserLabel(article)" />
             </button>
             <span>&nbsp;&nbsp;</span>
@@ -43,8 +39,10 @@
               @click="toggleFavorite"
               :class="toggleFavoriteButtonClasses(article)"
             >
-              <i class="ion-heart"></i> <span>&nbsp;</span>
-              <span v-text="favoriteArticleLabel(article)" /> <span>&nbsp;</span>
+              <i class="ion-heart"></i>
+              <span>&nbsp;</span>
+              <span v-text="favoriteArticleLabel(article)" />
+              <span>&nbsp;</span>
               <span class="counter" v-text="favoriteCounter(article)" />
             </button>
           </span>
@@ -58,17 +56,23 @@
             }"
           >
             <i class="ion-heart"></i>
-            <span class="counter"> {{ article.favoritesCount }} </span>
+            <span class="counter">{{ article.favoritesCount }}</span>
           </button>
-        </div>
-
-        <router-link :to="articleLink(article)" class="preview-link">
+    </div>-->
+    <!-- ####### Move to Component ArticleLink-->
+    <!-- <router-link :to="articleLink(article)" class="preview-link">
           <h1 v-text="article.title" />
           <p v-text="article.description" />
           <span>Read more...</span>
           <TagList :tags="article.tagList" />
         </router-link>
-      </div>
+    </div>-->
+    <div v-else>
+      <ArticleMeta
+        v-for="(article, index) in articles"
+        :article="article"
+        :key="article.title + index + 1"
+      />
       <VPagination :pages="pages" :currentPage.sync="currentPage" />
     </div>
   </div>
@@ -76,23 +80,24 @@
 
 <script>
 import { mapGetters } from "vuex";
+import ArticleMeta from "./ArticleShow";
 import VPagination from "./VPagination";
 import TagList from "./TagList";
-
-import {
-  FAVORITE_ADD,
-  FAVORITE_REMOVE,
-  FETCH_ARTICLES,
-  ARTICLE_DELETE,
-  FETCH_PROFILE_FOLLOW,
-  FETCH_PROFILE_UNFOLLOW,
-} from "@/store/actions.type";
+import { FETCH_ARTICLES } from "../store/actions.type";
+// import // FAVORITE_ADD,
+// FAVORITE_REMOVE,
+// FETCH_ARTICLES,
+// ARTICLE_DELETE
+// FETCH_PROFILE_FOLLOW,
+// FETCH_PROFILE_UNFOLLOW
+// "@/store/actions.type";
 
 export default {
-  name: "RwvArticleList",
+  name: "ArticleList",
   components: {
-    VPagination,
-    TagList
+    ArticleMeta,
+    TagList,
+    VPagination
   },
   props: {
     type: {
@@ -149,6 +154,27 @@ export default {
         filters
       };
     },
+    //  #### solving the "Loading Articles ..." issue preventing articles from appearing
+    //   pages() {
+    //     if (this.isLoading || this.articlesCount <= this.itemsPerPage) {
+    //       return [];
+    //     }
+    //     return [
+    //       ...Array(Math.ceil(this.articlesCount / this.itemsPerPage)).keys()
+    //     ].map(e => e + 1);
+    //   },
+    //   editArticleLink() {
+    //     return { name: "article-edit", params: { slug: this.article.slug } };
+    //   },
+    //   ...mapGetters([
+    //     "articlesCount",
+    //     "isLoading",
+    //     "articles",
+    //     "currentUser",
+    //     "profile",
+    //     "isAuthenticated"
+    //   ])
+    // },
     pages() {
       if (this.isLoading || this.articlesCount <= this.itemsPerPage) {
         return [];
@@ -157,12 +183,15 @@ export default {
         ...Array(Math.ceil(this.articlesCount / this.itemsPerPage)).keys()
       ].map(e => e + 1);
     },
-    editArticleLink() {
-      return { name: "article-edit", params: { slug: this.article.slug } };
-    },
-    ...mapGetters(["articlesCount", "isLoading", "articles", "currentUser", "profile", "isAuthenticated"])
+    ...mapGetters([
+      "articlesCount",
+      "isLoading",
+      "articles",
+      "currentUser",
+      "profile",
+      "isAuthenticated"
+    ])
   },
-
   watch: {
     currentPage(newValue) {
       this.listConfig.filters.offset = (newValue - 1) * this.itemsPerPage;
@@ -196,66 +225,67 @@ export default {
     resetPagination() {
       this.listConfig.offset = 0;
       this.currentPage = 1;
-    },
-    isCurrentUser(article) {
-      if (this.currentUser.username && article.author.username) {
-        return this.currentUser.username === article.author.username;
-      }
-      return false;
-    },
-    toggleFavorite() {
-      if (!this.isAuthenticated) {
-        this.$router.push({ name: "login" });
-        return;
-      }
-      const action = this.article.favorited ? FAVORITE_REMOVE : FAVORITE_ADD;
-      this.$store.dispatch(action, this.article.slug);
-    },
-    toggleFollow() {
-      if (!this.isAuthenticated) {
-        this.$router.push({ name: "login" });
-        return;
-      }
-      const action = this.article.following
-        ? FETCH_PROFILE_UNFOLLOW
-        : FETCH_PROFILE_FOLLOW;
-      this.$store.dispatch(action, {
-        username: this.profile.username
-      });
-    },
-    toggleFavoriteButtonClasses(article) {
-      return {
-        "btn-primary": article.favorited,
-        "btn-outline-primary": !article.favorited
-      };
-    },
-    articleLink(article) {
-      return {
-        name: "article",
-        params: {
-          slug: article.slug
-        }
-      };
-    },
-    followUserLabel(article) {
-      return `${this.profile.following ? "Unfollow" : "Follow"} ${
-        article.author.username
-      }`;
-    },
-    favoriteArticleLabel(article) {
-      return article.favorited ? "Unfavorite Article" : "Favorite Article";
-    },
-    favoriteCounter(article) {
-      return `(${article.favoritesCount})`;
-    },
-    async deleteArticle() {
-      try {
-        await this.$store.dispatch(ARTICLE_DELETE, this.article.slug);
-        this.$router.push("/");
-      } catch (err) {
-        console.error(err);
-      }
-    },
+    }
+    // ############## move to ArticleIntractive.vue Component
+    //   isCurrentUser(article) {
+    //     if (this.currentUser.username && article.author.username) {
+    //       return this.currentUser.username === article.author.username;
+    //     }
+    //     return false;
+    //   },
+    //   toggleFavorite() {
+    //     if (!this.isAuthenticated) {
+    //       this.$router.push({ name: "login" });
+    //       return;
+    //     }
+    //     const action = this.article.favorited ? FAVORITE_REMOVE : FAVORITE_ADD;
+    //     this.$store.dispatch(action, this.article.slug);
+    //   },
+    //   toggleFollow() {
+    //     if (!this.isAuthenticated) {
+    //       this.$router.push({ name: "login" });
+    //       return;
+    //     }
+    //     const action = this.article.following
+    //       ? FETCH_PROFILE_UNFOLLOW
+    //       : FETCH_PROFILE_FOLLOW;
+    //     this.$store.dispatch(action, {
+    //       username: this.profile.username
+    //     });
+    //   },
+    //   toggleFavoriteButtonClasses(article) {
+    //     return {
+    //       "btn-primary": article.favorited,
+    //       "btn-outline-primary": !article.favorited
+    //     };
+    //   },
+    //   articleLink(article) {
+    //     return {
+    //       name: "article",
+    //       params: {
+    //         slug: article.slug
+    //       }
+    //     };
+    //   },
+    //   followUserLabel(article) {
+    //     return `${this.profile.following ? "Unfollow" : "Follow"} ${
+    //       article.author.username
+    //     }`;
+    //   },
+    //   favoriteArticleLabel(article) {
+    //     return article.favorited ? "Unfavorite Article" : "Favorite Article";
+    //   },
+    //   favoriteCounter(article) {
+    //     return `(${article.favoritesCount})`;
+    //   },
+    //   async deleteArticle() {
+    //     try {
+    //       await this.$store.dispatch(ARTICLE_DELETE, this.article.slug);
+    //       this.$router.push("/");
+    //     } catch (err) {
+    //       console.error(err);
+    //     }
+    //   }
   }
 };
 </script>
