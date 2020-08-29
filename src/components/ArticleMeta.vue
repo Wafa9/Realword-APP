@@ -18,6 +18,17 @@
       :article="article"
       :canModify="isCurrentUser()"
     ></rwv-article-actions>
+    <span v-if="isCurrentUser(article)">
+      <!-- <router-link class="btn btn-sm btn-outline-secondary" :to="editArticleLink">
+        <i class="ion-edit"></i>
+        <span>&nbsp;Edit Article</span>
+      </router-link>-->
+      <span>&nbsp;&nbsp;</span>
+      <button class="btn btn-outline-danger btn-sm" @click="deleteArticle">
+        <i class="ion-trash-a"></i>
+        <span>&nbsp;Delete Article</span>
+      </button>
+    </span>
     <button
       v-else
       class="btn btn-sm pull-xs-right"
@@ -35,14 +46,17 @@
 
 <script>
 import { mapGetters } from "vuex";
-import ArticleInteractive from "@/components/ArticleInteractive";
-import { FAVORITE_ADD, FAVORITE_REMOVE } from "@/store/actions.type";
+
+import {
+  FAVORITE_ADD,
+  FAVORITE_REMOVE,
+  ARTICLE_DELETE
+  // ARTICLE_EDIT
+} from "@/store/actions.type";
 
 export default {
   name: "ArticleMeta",
-  components: {
-    ArticleInteractive
-  },
+
   props: {
     article: {
       type: Object,
@@ -56,6 +70,9 @@ export default {
   },
   computed: {
     ...mapGetters(["currentUser", "isAuthenticated"])
+    // editArticleLink() {
+    //   return { name: "article-edit", params: { slug: this.article.slug } };
+    // }
   },
   methods: {
     isCurrentUser() {
@@ -71,7 +88,18 @@ export default {
       }
       const action = this.article.favorited ? FAVORITE_REMOVE : FAVORITE_ADD;
       this.$store.dispatch(action, this.article.slug);
+    },
+    async deleteArticle() {
+      try {
+        await this.$store.dispatch(ARTICLE_DELETE, this.article.slug);
+        this.$router.push("/");
+      } catch (err) {
+        console.error(err);
+      }
     }
+    // editArticleLink() {
+    //   return { name: "article-edit", params: { slug: this.article.slug } };
+    // }
   }
 };
 </script>

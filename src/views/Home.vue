@@ -16,9 +16,8 @@
                   :to="{ name: 'home-my-feed' }"
                   class="nav-link"
                   active-class="active"
+                  >Your Feed</router-link
                 >
-                  Your Feed
-                </router-link>
               </li>
               <li class="nav-item">
                 <router-link
@@ -26,9 +25,8 @@
                   exact
                   class="nav-link"
                   active-class="active"
+                  >Global Feed</router-link
                 >
-                  Global Feed
-                </router-link>
               </li>
               <li class="nav-item" v-if="tag">
                 <router-link
@@ -36,7 +34,8 @@
                   class="nav-link"
                   active-class="active"
                 >
-                  <i class="ion-pound"></i> {{ tag }}
+                  <i class="ion-pound"></i>
+                  {{ tag }}
                 </router-link>
               </li>
             </ul>
@@ -47,8 +46,11 @@
           <div class="sidebar">
             <p>Popular Tags</p>
             <div class="tag-list">
-              <RwvTag v-for="(tag, index) in tags" :name="tag" :key="index">
-              </RwvTag>
+              <RwvTag
+                v-for="(tag, index) in tags"
+                :name="tag"
+                :key="index"
+              ></RwvTag>
             </div>
           </div>
         </div>
