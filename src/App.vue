@@ -20,8 +20,9 @@ export default {
 </script>
 
 <style>
+*,
 html {
-  font-family: "Source Code Pro", monospace;
+  font-family: "Inconsolata", monospace;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -56,5 +57,8 @@ html {
 }
 .profile-page .user-info {
   background: #b6e6bd;
+}
+footer {
+  position: relative;
 }
 </style>
