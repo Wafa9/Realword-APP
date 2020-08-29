@@ -86,9 +86,6 @@ export default {
       };
     },
     //  #### solving the "Loading Articles ..." issue preventing articles from appearing
-    //   editArticleLink() {
-    //     return { name: "article-edit", params: { slug: this.article.slug } };
-    //   },
 
     pages() {
       if (this.isLoading || this.articlesCount <= this.itemsPerPage) {
