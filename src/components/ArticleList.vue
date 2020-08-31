@@ -95,9 +95,7 @@ export default {
         ...Array(Math.ceil(this.articlesCount / this.itemsPerPage)).keys()
       ].map(e => e + 1);
     },
-    // editArticleLink() {
-    //   return { name: "article-edit", params: { slug: this.article.slug } };
-    // },
+
     ...mapGetters([
       "articlesCount",
       "isLoading",
